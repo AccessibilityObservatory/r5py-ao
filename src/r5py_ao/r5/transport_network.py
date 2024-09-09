@@ -37,7 +37,7 @@ start_jvm()
 class TransportNetwork:
     """Wrap a com.conveyal.r5.transit.TransportNetwork."""
 
-    def __init__(self, osm_pbf, gtfs=[]):
+    def __init__(self, osm_pbf, gtfs=[], barriers=None):
         """
         Load a transport network.
 
@@ -47,11 +47,15 @@ class TransportNetwork:
             file path of an OpenStreetMap extract in PBF format
         gtfs : str | pathlib.Path | list[str] | list[pathlib.Path]
             path(s) to public transport schedule information in GTFS format
+        barriers : str | pathlib.Path
+            path to link barrier features in shapefile or geopackage format
         """
         osm_pbf = self._working_copy(pathlib.Path(osm_pbf)).absolute()
         if isinstance(gtfs, (str, pathlib.Path)):
             gtfs = [gtfs]
         gtfs = [str(self._working_copy(path).absolute()) for path in gtfs]
+        if barriers:
+            barriers = self._working_copy(pathlib.Path(barriers)).absolute()
 
         transport_network = com.conveyal.r5.transit.TransportNetwork()
         transport_network.scenarioId = PACKAGE
@@ -85,6 +89,18 @@ class TransportNetwork:
         transfer_finder.findParkRideTransfer()
 
         transport_network.transitLayer.buildDistanceTables(None)
+        
+        if barriers:
+            match barriers.suffix:
+                case ".shp" | ".SHP":
+                    link_barrier_layer = com.conveyal.r5.streets.LinkBarrierLayer.fromShapefile(str(barriers))
+                case ".gpkg" | ".GPKG":
+                    link_barrier_layer = com.conveyal.r5.streets.LinkBarrierLayer.fromGeopackage(str(barriers))
+                case _:
+                    raise ValueError(
+                        f"Unrecognized barrier format '{barriers.suffix}'. Must be .shp, .SHP, .gpkg, or .GPKG"
+                    )
+            transport_network.linkBarrierLayer = link_barrier_layer
 
         self._transport_network = transport_network
 
