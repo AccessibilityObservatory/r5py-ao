@@ -3,7 +3,7 @@ build-backend = "setuptools.build_meta"
 requires = ["setuptools>=61.0.0", "wheel"]
 
 [project]
-name = "r5py"
+name = "r5py_ao"
 description = "Python wrapper for the R5 routing analysis engine"
 readme = "README.md"
 
@@ -12,7 +12,8 @@ authors = [
     { name = "Willem Klumpenhouwer" },
     { name = "Marcus Sairava" },
     { name = "Rafael Pereira" },
-    { name = "Henrikki Tenkanen" }
+    { name = "Henrikki Tenkanen" },
+    { name = "Andrew Owen" }
 ]
 
 dependencies = [
@@ -46,11 +47,11 @@ dynamic = ["version"]
 [project.optional-dependencies]
 docs = ["contextily", "folium", "GitPython", "h3>=4.0.0b2", "jupyterlab_myst",
         "mapclassify", "matplotlib", "myst-nb", "nbsphinx", "pybtex-apa7-style",
-        "r5py.sampledata.helsinki>=0.1.1", "r5py.sampledata.sao_paulo>=0.1.1",
+        "r5py-ao.sampledata.helsinki>=0.1.1", "r5py-ao.sampledata.sao_paulo>=0.1.1",
         "shapely", "sphinx", "sphinx-book-theme", "sphinx-design",
         "sphinxcontrib-bibtex", "sphinxcontrib-images"]
 tests = ["pytest", "pytest-asyncio", "pytest-cov", "pytest-lazy-fixture",
-         "r5py.sampledata.helsinki>=0.1.1", "r5py.sampledata.sao_paulo>=0.1.1"]
+         "r5py0ao.sampledata.helsinki>=0.1.1", "r5py-ao.sampledata.sao_paulo>=0.1.1"]
 
 
 [project.urls]
@@ -77,4 +78,4 @@ testpaths = ["tests"]
 asyncio_mode = "auto"
 
 [tool.setuptools.dynamic]
-version = {attr = "r5py.__version__"}
+version = {attr = "r5py_ao.__version__"}
