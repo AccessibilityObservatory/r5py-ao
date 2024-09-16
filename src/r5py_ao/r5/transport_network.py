@@ -89,7 +89,7 @@ class TransportNetwork:
         transfer_finder.findParkRideTransfer()
 
         transport_network.transitLayer.buildDistanceTables(None)
-        
+
         if barriers:
             match barriers.suffix:
                 case ".shp" | ".SHP":
@@ -126,10 +126,16 @@ class TransportNetwork:
             del self.transit_layer
         except AttributeError:
             pass
-        del self._transport_network
+        try:
+            del self._transport_network
+        except AttributeError:
+            pass
 
         time.sleep(0.5)
-        jpype.java.lang.System.gc()
+        try:
+            jpype.java.lang.System.gc()
+        except jpype.JVMNotRunning:
+            pass
 
         # then, try to delete all files in cache directory
         temporary_files = [child for child in self._cache_directory.iterdir()]
