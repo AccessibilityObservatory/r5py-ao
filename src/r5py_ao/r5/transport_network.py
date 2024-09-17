@@ -89,7 +89,7 @@ class TransportNetwork:
         transfer_finder.findParkRideTransfer()
 
         transport_network.transitLayer.buildDistanceTables(None)
-        
+
         if barriers:
             match barriers.suffix:
                 case ".shp" | ".SHP":
@@ -113,57 +113,64 @@ class TransportNetwork:
         # first, close the open osm_file,
         # delete Java objects, and
         # trigger Java garbage collection
-        try:
-            self.osm_file.close()
-        except jpype.JVMNotRunning:
-            # JVM was stopped already, file should be closed
-            pass
-        try:
-            del self.street_layer
-        except AttributeError:  # might not have been accessed a single time
-            pass
-        try:
-            del self.transit_layer
-        except AttributeError:
-            pass
-        del self._transport_network
+        if jpype.isJVMStarted():
+            try:
+                self.osm_file.close()
+            except jpype.JVMNotRunning:
+                # JVM was stopped already, file should be closed
+                pass
+            try:
+                del self.street_layer
+            except AttributeError:  # might not have been accessed a single time
+                pass
+            try:
+                del self.transit_layer
+            except AttributeError:
+                pass
+            try:
+                del self._transport_network
+            except AttributeError:
+                pass
 
-        time.sleep(0.5)
-        jpype.java.lang.System.gc()
+            time.sleep(0.5)
+            try:
+                jpype.java.lang.System.gc()
+            except jpype.JVMNotRunning:
+                pass
 
-        # then, try to delete all files in cache directory
-        temporary_files = [child for child in self._cache_directory.iterdir()]
-        for _ in range(MAX_TRIES):
-            for temporary_file in temporary_files:
-                try:
-                    temporary_file.unlink()
-                    temporary_files.remove(temporary_file)
-                except (FileNotFoundError, IOError, OSError):
-                    print(
-                        f"could not delete {temporary_file}, keeping in {temporary_files}"
-                    )
-                    pass
+            # then, try to delete all files in cache directory
+            temporary_files = [child for child in self._cache_directory.iterdir()]
+            for _ in range(MAX_TRIES):
+                for temporary_file in temporary_files:
+                    try:
+                        temporary_file.unlink()
+                        temporary_files.remove(temporary_file)
+                    except (FileNotFoundError, IOError, OSError):
+                        print(
+                            f"could not delete {temporary_file}, keeping in {temporary_files}"
+                        )
+                        pass
 
-            if not temporary_files:  # empty
-                break
+                if not temporary_files:  # empty
+                    break
 
-            # there are still files open, let’s wait a moment and try again
-            time.sleep(0.1)
-        else:
-            remaining_files = ", ".join(
-                [f"{temporary_file}" for temporary_file in temporary_files]
-            )
-            warnings.warn(
-                f"Failed to clean cache directory ‘{self._cache_directory}’. "
-                f"Remaining file(s): {remaining_files}",
-                RuntimeWarning,
-            )
+                # there are still files open, let’s wait a moment and try again
+                time.sleep(0.1)
+            else:
+                remaining_files = ", ".join(
+                    [f"{temporary_file}" for temporary_file in temporary_files]
+                )
+                warnings.warn(
+                    f"Failed to clean cache directory ‘{self._cache_directory}’. "
+                    f"Remaining file(s): {remaining_files}",
+                    RuntimeWarning,
+                )
 
-        # finally, try to delete the cache directory itself
-        try:
-            self._cache_directory.rmdir()
-        except OSError:  # not empty
-            pass  # the JVM destructor is going to take care of this
+            # finally, try to delete the cache directory itself
+            try:
+                self._cache_directory.rmdir()
+            except OSError:  # not empty
+                pass  # the JVM destructor is going to take care of this
 
     @classmethod
     def from_directory(cls, path):
