@@ -46,6 +46,7 @@ class RegionalTask:
         max_public_transport_rides=8,
         max_bicycle_traffic_stress=3,
         breakdown=False,
+        max_pedestrian_traffic_stress=3
     ):
         """
         Create a RegionalTask, a computing request for R5.
@@ -112,6 +113,8 @@ class RegionalTask:
             https://docs.conveyal.com/learn-more/traffic-stress Default: 3
         breakdown : bool
             Compute a more detailed breakdown of the routes. Default: False
+        max_pedestrian_traffic_stress: int
+            Maximum stress level for pedestrian routing. Default: 3
         """
         self._regional_task = com.conveyal.r5.analyst.cluster.RegionalTask()
         self.scenario = Scenario()
@@ -146,6 +149,8 @@ class RegionalTask:
 
         self.max_public_transport_rides = max_public_transport_rides
         self.max_bicycle_traffic_stress = max_bicycle_traffic_stress
+
+        self.max_pedestrian_traffic_stress = max_pedestrian_traffic_stress
 
         # always record travel times
         self._regional_task.recordTimes = True
@@ -340,6 +345,20 @@ class RegionalTask:
     def max_bicycle_traffic_stress(self, max_bicycle_traffic_stress):
         self._max_bicycle_traffic_stress = max_bicycle_traffic_stress
         self._regional_task.bikeTrafficStress = max_bicycle_traffic_stress
+
+    @property
+    def max_pedestrian_traffic_stress(self):
+        """
+        Find routes with this maximum stress level for pedestrians.
+    
+        Int
+        """
+        return self._max_pedestrian_traffic_stress
+    
+    @max_pedestrian_traffic_stress.setter
+    def max_pedestrian_traffic_stress(self, max_pedestrian_traffic_stress):
+        self._max_pedestrian_traffic_stress = max_pedestrian_traffic_stress
+        self._regional_task.pedTrafficStress = max_pedestrian_traffic_stress
 
     @property
     def max_public_transport_rides(self):
