@@ -37,7 +37,7 @@ start_jvm()
 class TransportNetwork:
     """Wrap a com.conveyal.r5.transit.TransportNetwork."""
 
-    def __init__(self, osm_pbf, gtfs=[], barriers=None):
+    def __init__(self, osm_pbf, gtfs=[], barriers=None, **kwargs):
         """
         Load a transport network.
 
@@ -68,6 +68,10 @@ class TransportNetwork:
         self.osm_file = osm_file  # keep the mapdb open, close in destructor
 
         transport_network.streetLayer = com.conveyal.r5.streets.StreetLayer()
+        if "plts_tag_name" in kwargs:
+            transport_network.streetLayer.pltsLabeler.setPLTSTag(kwargs["plts_tag_name"])
+        if "default_plts_value" in kwargs:
+            transport_network.streetLayer.pltsLabeler.setDefaultPLTSValue(kwargs["default_plts_value"])
         transport_network.streetLayer.loadFromOsm(osm_file)
         transport_network.streetLayer.parentNetwork = transport_network
         transport_network.streetLayer.indexStreets()
