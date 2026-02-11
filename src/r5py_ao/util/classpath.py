@@ -17,8 +17,8 @@ from .warnings import R5pyWarning
 
 
 # update these to use a newer R5 version if no R5 available locally
-R5_JAR_URL = "https://github.com/AccessibilityObservatory/r5/releases/download/v6.9-ao2/r5-v6.9-ao2-all.jar"
-R5_JAR_SHA256 = "088becfeb538176bf5ebda269ffe01ff5857201cedfff46f9734a8feb10bd529"
+R5_JAR_URL = "https://github.com/AccessibilityObservatory/r5/releases/download/v6.9-ao3/r5-v6.9-ao3-all.jar"
+R5_JAR_SHA256 = "4dcd97f427cc699d6f8ae1d4c2b63540a11a64b3ccf9fe3818361dfcfd85d1e2"
 # ---
 
 
